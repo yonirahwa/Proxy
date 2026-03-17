@@ -21,7 +21,7 @@ export default {
         },
       });
     } catch (err) {
-      return new Response(Proxy error: ${err.message}, { status: 500 });
+      return new Response(`Proxy error: ${err.message}`, { status: 500 });
     }
   }
 };
