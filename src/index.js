@@ -1,6 +1,25 @@
 export default {
   async fetch(request) {
-    const urlParam = new URL(request.url).searchParams.get('url');
+    const url = new URL(request.url);
+
+    // ==========================================
+    // 1. TELEGRAM PROXY MODE 
+    // Passes any /bot... paths directly to Telegram with all bodies/headers intact
+    // ==========================================
+    if (url.pathname.startsWith('/bot') || url.pathname.startsWith('/file/bot')) {
+      url.hostname = 'api.telegram.org';
+      
+      // Clone the exact request (method, body, headers) and redirect
+      return fetch(new Request(url.toString(), new Request(request, {
+        body: request.body
+      })));
+    }
+
+    // ==========================================
+    // 2. YOUR ORIGINAL SCRAPER PROXY MODE
+    // Used for ?url= params (kept unmodified so nothing breaks)
+    // ==========================================
+    const urlParam = url.searchParams.get('url');
     if (!urlParam) return new Response('Missing ?url=', { status: 400 });
 
     try {
